@@ -1,0 +1,30 @@
+## test directement sur le service
+POST http://localhost:8081/auth/login
+Content-Type: application/json
+
+{
+  "username": "metsa",
+  "password": "adminpass"
+}
+
+> {% 
+client.global.set("jwt_token", response.body.token);
+%}
+
+### Login pour récupérer le JWT
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "metsa",
+  "password": "adminpass"
+}
+
+> {% 
+client.global.set("jwt_token", response.body.token);
+%}
+
+### Tester le secure-endpoint
+GET http://localhost:8080/auth/secure-endpoint
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NjgxODU1MiwiZXhwIjoxNzQ2ODIyMTUyfQ.gu5a0tGu2yV7WpCuyBb1I2YTKAj6u43xphDl5OipXqUb5oQl5Od5BIZVdmS1LVy8RN_Nox80WiF-NAn14w5UJfW-SteP3jIpOT0TiLD_jxvnRdLActhC7Wq3p5RohImL8F3ms1ujhYMiTxGjSR-Z2LOfOMDTR3QlT9yhS8UUtZzEzgM4BZCTPJFgChWuCGFUCz2oqktNIHzDwWJHPNlekS60_WrebdPk6LRN5jUMUlSuSRa2DAyDJtSQmJUdZqaIoy84vUbf3KPrnUGKFje-6UJZk1jEOLV_tzNoxYX95YbABISWj1BxSpQDv3ubCo1K5eWLHLtD64HkHRlab27ZUA
+Accept: application/json
