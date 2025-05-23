@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # === Paramètres de base ===
-SERVICES=("iam" "gateway" "config-server" "reservation" "billing" "notification" "invitation" "postgres")
+SERVICES=("config-server" "gateway" "postgres" "iam" "reservation" "billing" "notification" "invitation")
 SCRIPTS_DIR="/home/debian/amcloud-platform/scripts"
 
 echo ">> Déploiement de tous les services : ${SERVICES[*]}"

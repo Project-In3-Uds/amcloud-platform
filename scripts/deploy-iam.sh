@@ -58,5 +58,5 @@ else
 
   cd "$CLONE_DIR/$PATH_TO_POM" || exit 1
   nohup java -jar target/*.jar > "$CLONE_DIR/$SERVICE_NAME.log" 2>&1 &
-
+fi
 echo ">> Vérifiez $CLONE_DIR/$SERVICE_NAME.log pour le statut."
