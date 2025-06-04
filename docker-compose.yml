@@ -5,6 +5,25 @@ networks:
     driver: bridge
 
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx/gateway.conf:/etc/nginx/conf.d/gateway.conf:ro
+      - ./nginx/configserver.conf:/etc/nginx/conf.d/configserver.conf:ro
+      - ./nginx/iam.conf:/etc/nginx/conf.d/iam.conf:ro
+      - ./nginx/platform.amcloud.cm.conf:/etc/nginx/conf.d/platform.amcloud.cm.conf:ro
+      - ./certs:/etc/nginx/certs:ro 
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - amcloud-network
+    depends_on:
+      - gateway
+      - configserver
+      - iam
+
   configserver:
     image: ghcr.io/projects-in3-uds/configserver:1.0.1
     container_name: configserver
