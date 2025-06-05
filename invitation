@@ -1,0 +1,16 @@
+ 
+# === Base de données ===
+MAIN_DB_URL=jdbc:postgresql://postgres:5432/amcloud_reservation_db
+MAIN_DB_USERNAME=amcloud_admin
+MAIN_DB_PASSWORD=amcloud_pass
+MAIN_DB_DRIVER_CLASS_NAME=org.postgresql.Driver
+JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+SQL_INIT_MODE=always
+JPA_HIBERNATE_DDL_AUTO=update
+# === Server Ports ===
+INVITATION_SERVER_PORT=8084
+
+# === Path to .env file ===
+GITHUB_USERNAME=Projects-In3-Uds
+#GITHUB_TOKEN=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
+CONFIG_SERVER_URL=http://configserver:8888

@@ -1,0 +1,10 @@
+# === Notification Service Configuration ===
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=project.in3.uds@gmail.com
+MAIL_PASSWORD=rroy hibw ncju ykhf
+NOTIFICATION_SERVER_PORT=8085
+# github config var
+GITHUB_USERNAME=Projects-In3-Uds
+GITHUB_TOKEN=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
+CONFIG_SERVER_URL=http://configserver:8888

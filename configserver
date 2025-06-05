@@ -1,0 +1,10 @@
+# === Github config ===
+GIT_URI=https://github.com/Project-In3-Uds/amcloud-config-server
+GITHUB_USERNAME=Projects-In3-Uds
+GITHUB_TOKEN=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
+GITHUB_BRANCH=develop
+
+# === Server Ports ===
+CONFIG_SERVER_PORT=8888
+
+# === Path to .env file ===

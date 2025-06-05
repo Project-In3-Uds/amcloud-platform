@@ -38,7 +38,7 @@ env_dir="./env"
 mkdir -p "$env_dir"
 
 for service in "${services[@]}"; do
-  secret_name="env-$service"
+  secret_name="env-$service-1"
   raw_env="$env_dir/.env.$service.raw"
   fixed_env="$env_dir/.env.$service"
   # Fetch secret (may be JSON string with escaped newlines and quotes)
