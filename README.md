@@ -1,161 +1,124 @@
 # amcloud-platform
 
-Bienvenue sur **amcloud-platform**, la plateforme cloud modulaire conçue pour orchestrer, déployer et connecter de multiples services métier (IAM, gateway, reservation, billing, notification, invitation, config-server, etc.), de manière simple et scalable.
+## Description
+amcloud-platform is the main repository for the AMCLOUD ecosystem, serving as the centralized entry point for deploying and managing the platform across various environments, including local setups, cloud environments like Azure, and hybrid infrastructures.  
 
-Ce README vous guide pour démarrer rapidement, comprendre la structure du dépôt, et intégrer de nouveaux services.
+This repository orchestrates the deployment of all microservices that form the AMCLOUD ecosystem, ensuring seamless integration and communication between them. Each microservice plays a specific role in the platform:
 
----
+- **[IAM (Identity and Access Management)](https://github.com/Project-In3-Uds/amcloud-iam)**: Handles authentication, authorization, and user management, enabling secure access control across microservices.
+- **[Gateway](https://github.com/Project-In3-Uds/amcloud-gateway)**: Acts as the API Gateway, managing routing, authentication, and authorization for microservices, ensuring secure and efficient communication.
+- **[Config Server](https://github.com/Project-In3-Uds/amcloud-config-server)**: Centralizes and manages configuration properties for microservices, enabling dynamic and secure updates.
+- **[Billing](https://github.com/Project-In3-Uds/amcloud-billing)**: Manages billing creation, updates, and retrieval, supporting subscription and payment workflows.
+- **[Reservation](https://github.com/Project-In3-Uds/amcloud-reservation)**: Handles reservation creation, updates, and retrieval, facilitating booking and scheduling processes.
+- **[Notification](https://github.com/Project-In3-Uds/amcloud-notification)**: Sends notifications to users, ensuring timely communication and updates.
+- **[Invitation](https://github.com/Project-In3-Uds/amcloud-invitation)**: Manages invitation creation, updates, and retrieval, supporting user onboarding and event invitations.
 
-## Sommaire
+Additionally, this repository includes Docker Compose configurations for orchestrating the microservices, making it easy to deploy the platform in any environment.
 
-- [Présentation](#présentation)
-- [Architecture & Composants](#architecture--composants)
-- [Structure du Dépôt](#structure-du-dépôt)
-- [Installation & Démarrage Rapide](#installation--démarrage-rapide)
-- [Utilisation des Scripts](#utilisation-des-scripts)
-- [Gestion des Environnements](#gestion-des-environnements)
-- [Accès aux Autres Services](#accès-aux-autres-services)
-- [Déploiement Azure](#déploiement-azure)
-- [Documentation & Wiki](#documentation--wiki)
-- [FAQ](#faq)
+## Prerequisites
 
----
+- Docker and Docker Compose (required for deployment)
+- Git
+- [Optional] Java JDK 17 or higher (for local development of individual microservices)
+- [Optional] Maven 3.9+ (for building individual microservices)
 
-## Présentation
+## Repository Structure
 
-**amcloud-platform** est une plateforme cloud multi-services intégrant :
-- Un serveur d’identités (IAM),
-- Une passerelle d’API (gateway),
-- Des services métier (réservation, facturation, notifications, invitations),
-- Une gestion centralisée de configuration,
-- Un backend PostgreSQL.
+```
+amcloud-platform/
+├── azure/                        # Azure deployment configurations
+├── certs/                        # SSL certificates for secure communication
+├── docker/                       # Docker configurations for individual microservices
+├── docker-compose.yml            # Docker Compose configuration for orchestrating microservices
+├── env/                          # Environment variable files for microservices
+├── init-scripts/                 # Database initialization scripts
+├── nginx/                        # NGINX configuration files for reverse proxy
+├── restClient-Tests/             # REST client test files for microservices
+├── scripts/                      # Utility scripts for setup and maintenance
+├── docs/                         # Documentation and diagrams for the platform
+└── README.md                     # Project overview and instructions
+```
 
-Pensée pour la modularité, chaque service peut être déployé individuellement ou en mode full-stack.
+## Installation & Setup
 
----
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/Project-In3-Uds/amcloud-platform.git
+cd amcloud-platform
+```
 
-## Architecture & Composants
+### Step 2: Configure Environment Variables
+Environment variable files are ignored by `.gitignore` for security reasons.  
+Each `.env` file must follow the naming convention `.env.[SERVICE_NAME]`.  
 
-Chaque service est conteneurisé (Docker) et orchestré via Docker Compose pour garantir portabilité et facilité de déploiement.
+Example for `env/.env.config-server`:
+```bash
+# === GitHub Configuration ===
+GIT_URI=https://github.com/Project-In3-Uds/amcloud-config-server
+GITHUB_USERNAME=Projects-In3-Uds
+GITHUB_TOKEN=your_github_token_here
+GITHUB_BRANCH=main
 
-**Services principaux** :
-- `iam` : Gestion des utilisateurs, authentification, autorisation.
-- `gateway` : API Gateway centralisant l’accès à tous les services.
-- `reservation`, `billing`, `notification`, `invitation` : Services métier indépendants.
-- `config-server` : Centralisation de la configuration de tous les services.
-- `postgres` : Base de données relationnelle.
+# === Server Ports ===
+CONFIG_SERVER_PORT=8888
+```
 
-**Intégration entre services :**
-- Les services communiquent via REST (HTTP) à travers la gateway ou en direct selon les cas d’usage.
-- Pour accéder à d'autres services depuis votre code, vous pouvez intégrer les endpoints via la gateway (ex: `http://gateway:8080/api/reservation`), ou directement par leur nom de service Docker (ex: `http://reservation:8081/` dans le réseau Docker).
-- Des exemples de requêtes sont disponibles dans le fichier `restClient-Test` et la page [Pratiques API REST](./wiki/Pratiques-API-REST).
+For examples of `.env` files for other services, refer to their respective README files:
+- [amcloud-gateway README](https://github.com/Project-In3-Uds/amcloud-gateway/blob/main/README.md)
+- [amcloud-iam README](https://github.com/Project-In3-Uds/amcloud-iam/blob/main/README.md)
+- [amcloud-reservation README](https://github.com/Project-In3-Uds/amcloud-reservation/blob/main/README.md)
+- [amcloud-billing README](https://github.com/Project-In3-Uds/amcloud-billing/blob/main/README.md)
+- [amcloud-notification README](https://github.com/Project-In3-Uds/amcloud-notification/blob/main/README.md)
+- [amcloud-invitation README](https://github.com/Project-In3-Uds/amcloud-invitation/blob/main/README.md)
 
----
+### Step 3: Start Services with Docker Compose
+Run the following command to start all microservices:
+```bash
+docker-compose up -d
+```
 
-## Structure du Dépôt
+Or start each microservice individually :
+```bash
+docker-compose up -d iam
+```
 
-| Dossier/Fichier           | Rôle                                                                                   |
-|--------------------------|----------------------------------------------------------------------------------------|
-| `scripts/`               | Scripts Bash pour déployer ou vérifier les services (`deploy-*.sh`, `check-services.sh`). |
-| `docker/`                | Dockerfiles de build pour chaque service (un sous-dossier par service).                 |
-| `env/`                   | Fichiers `.env.[service]` définissant les variables d’environnement de chaque service.  |
-| `docker-compose.yml`     | Orchestration de tous les services pour le développement ou la CI/CD.                  |
-| `restClient-Test`        | Fichier de requêtes de test pour chaque API/service.                                   |
-| `...`                    | Code source, documentation, configurations additionnelles, etc.                        |
+### Step 4: Verify Services
+Check services status and thiers healthy state
+```bash
+docker-compose ps
+```  
 
----
+And for more informations or further troubleshooting
+```bash
+docker-compose logs
+``` 
 
-## Installation & Démarrage Rapide
+## Architecture Overview
 
-1. **Prérequis** :  
-   - [Docker](https://www.docker.com/) et [Docker Compose](https://docs.docker.com/compose/)
-   - Cloner ce dépôt :  
-     ```bash
-     git clone https://github.com/<owner>/amcloud-platform.git
-     cd amcloud-platform
-     ```
-2. **Configurer les environnements** :  
-   Copier/modifier les fichiers `.env.[service]` dans le dossier `env/` selon vos besoins.
-3. **Lancer la plateforme** :  
-   ```bash
-   docker-compose up -d
-   ```
-   Tous les services seront accessibles via la gateway ou leurs ports dédiés.
-4. **Tester les services** :  
-   Utilisez le fichier `restClient-Test` (compatible VSCode REST Client) pour tester les endpoints.
+Below is the architecture diagram showing how the microservices interact within the AMCLOUD ecosystem:
 
----
+![Architecture Diagram](docs/diagrams/architecture.png)
 
-## Utilisation des Scripts
+## Known Issues / Limitations
 
-- **Déploiement d’un service spécifique** :
-  ```bash
-  ./scripts/deploy-iam.sh
-  ```
-- **Déploiement global de la plateforme** :
-  ```bash
-  ./scripts/deploy-all.sh
-  ```
-- **Vérification de l’état des services** :
-  ```bash
-  ./scripts/check-services.sh
-  ```
+- Requires Docker Compose for deployment.
+- Each microservice must be configured individually using `.env` files.
+- No centralized rate-limiting or circuit breaker by default (consider adding these features in production).
 
-_Détail complet dans la page [Scripts du Wiki](./wiki/Scripts)._
+## Support / Contact
 
----
+- For questions or support, [open an issue](https://github.com/Project-In3-Uds/amcloud-platform/issues).
+- For real-time discussion, contact us at project.in3.uds@outlook.com.
 
-## Gestion des Environnements
+## Contribution
 
-Chaque service dispose d’un fichier `.env.[service]` dans `env/`, monté automatiquement dans le container correspondant.  
-Adaptez les variables (ports, credentials, URLs) selon votre contexte.
+We welcome contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before submitting a pull request.
 
-_Détails et bonnes pratiques disponibles dans [Environnements (.env)](./wiki/Environnements-.-env-)._
+## License
 
----
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
-## Accès aux Autres Services / Intégration
+## Credits
 
-Pour accéder à un autre service depuis un service applicatif :
-- **Via la Gateway** (centralisé, sécurisé, recommandé) :
-  ```http
-  http://gateway:8080/api/<service>/<endpoint>
-  ```
-- **Directement (dans le réseau Docker)** :
-  ```http
-  http://<service>:<port>/<endpoint>
-  ```
-Adaptez l’intégration selon la logique de votre microservice (voir les exemples dans `restClient-Test`).
-
----
-
-## Déploiement Azure
-
-Pour un déploiement sur Azure, reportez-vous à la page [Azure deployment](./wiki/Azure-deployment) du Wiki (scripts, pipelines, variables…).
-
----
-
-## Documentation & Wiki
-
-Retrouvez toute la documentation détaillée dans le [Wiki du projet](./wiki/Accueil) :
-
-- Guides d’utilisation
-- Architecture
-- Intégration
-- FAQ, bonnes pratiques, etc.
-
----
-
-## FAQ
-
-Consultez la page [FAQ](./wiki/FAQ) pour les questions et solutions courantes.
-
----
-
-### Contribution
-
-Les contributions sont les bienvenues ! Merci de consulter le Wiki et d’ouvrir des issues pour toute question ou suggestion.
-
----
-
-© 2025 amcloud-platform
+Developed by Project-In3-Uds contributors.  
+Special thanks to all open-source libraries and the community!
