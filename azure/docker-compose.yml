@@ -25,7 +25,7 @@ services:
       - iam
 
   configserver:
-    image: ghcr.io/project-in3-uds/configserver:1.0.1
+    image: ghcr.io/project-in3-uds/config-server:1.0.1
     container_name: configserver
     volumes:
       - ./env/.env.config-server:/app/.env:ro
@@ -62,7 +62,7 @@ services:
       start_period: 30s
 
   gateway:
-    image: ghcr.io/projects-in3-uds/gateway:1.0.1
+    image: ghcr.io/project-in3-uds/gateway:1.0.1
     container_name: gateway
     volumes:
      - ./env/.env.gateway:/app/.env:ro
@@ -199,3 +199,6 @@ services:
 
 volumes:
   postgres-data:
+
+
+
