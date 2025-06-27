@@ -1,0 +1,61 @@
+### Test IAM Login through Nginx
+POST https://platform.amcloud.cm/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "adminpass"
+}
+
+> {% 
+client.global.set("jwt_token", response.body.token);
+%}
+
+### Test Secure Endpoint through Nginx (should succeed with valid token)
+GET http://platform.amcloud.cm/auth/secure-endpoint
+Authorization: Bearer {{jwt_token}}
+Accept: application/json
+
+### Test Secure Endpoint through Nginx without token (should fail with 401)
+GET http://platform.amcloud.cm/auth/secure-endpoint
+Accept: application/json
+
+### Fetch OpenID Connect Configuration through Nginx
+GET http://platform.amcloud.cm/.well-known/openid-configuration
+
+### Fetch JWKS (JSON Web Key Set) through Nginx
+GET https://platform.amcloud.cm/jwks.json
+
+### Test Gateway Secure Endpoint through Nginx
+GET http://platform.amcloud.cm/secure-data
+Authorization: Bearer {{jwt_token}}
+Accept: application/json
+
+### Test Gateway Billing Route through Nginx
+GET http://platform.amcloud.cm/billing/list
+Authorization: Bearer eyJraWQiOiJteS1rZXktaWQiLCJhbGciOiJSUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInNjb3BlcyI6WyJyZWFkIiwid3JpdGUiXSwic3ViIjoiYWRtaW4iLCJpYXQiOjE3NDkwMjc0NzIsImV4cCI6MTc0OTAzMTA3MiwiaXNzIjoiaHR0cDovL2lhbTo4MDgxIn0.gdeVqDfPOUKHR4sm_Ws9vsuk3Uf0ymd5oi7sjZeTs9eQrzmSdLZgXecFMF_-M1tdWoTiNfYT0a2RIs0C7HDONBeNOnWjNRBT10eJk8_ViyaA1AWgU21dnI8ctT0R9JA6RrFyI8xKCHSNYH654ZYA6RUk46Vo0oCA24zb6ZNBMEQM_WAbp59RVOTuv758gJ5uKLuvYIlG1IZX15t359BzxFouggVBl0126xUam2zmOee0uts02yCKefXJuUt_CttLzhajqOD9hYGAxqOgp1hxC-Vwqpa7XqTHb2Y7Tg9fvgv8-_nmRPVN2jukq9V1aQxzd10yXzdab-gGSR4Xf-CjVw
+Accept: application/json
+
+### Test Gateway Reservation Route through Nginx
+GET http://platform.amcloud.cm/reservations/list
+Authorization: Bearer eyJraWQiOiJteS1rZXktaWQiLCJhbGciOiJSUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInNjb3BlcyI6WyJyZWFkIiwid3JpdGUiXSwic3ViIjoiYWRtaW4iLCJpYXQiOjE3NDkwMjc0NzIsImV4cCI6MTc0OTAzMTA3MiwiaXNzIjoiaHR0cDovL2lhbTo4MDgxIn0.gdeVqDfPOUKHR4sm_Ws9vsuk3Uf0ymd5oi7sjZeTs9eQrzmSdLZgXecFMF_-M1tdWoTiNfYT0a2RIs0C7HDONBeNOnWjNRBT10eJk8_ViyaA1AWgU21dnI8ctT0R9JA6RrFyI8xKCHSNYH654ZYA6RUk46Vo0oCA24zb6ZNBMEQM_WAbp59RVOTuv758gJ5uKLuvYIlG1IZX15t359BzxFouggVBl0126xUam2zmOee0uts02yCKefXJuUt_CttLzhajqOD9hYGAxqOgp1hxC-Vwqpa7XqTHb2Y7Tg9fvgv8-_nmRPVN2jukq9V1aQxzd10yXzdab-gGSR4Xf-CjVw
+Accept: application/json
+
+### Test Gateway Invitation Route through Nginx
+POST https://platform.amcloud.cm/invitations/create
+Content-Type: application/json
+Authorization: Bearer eyJraWQiOiJteS1rZXktaWQiLCJhbGciOiJSUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInNjb3BlcyI6WyJyZWFkIiwid3JpdGUiXSwic3ViIjoiYWRtaW4iLCJpYXQiOjE3NDkwMjc0NzIsImV4cCI6MTc0OTAzMTA3MiwiaXNzIjoiaHR0cDovL2lhbTo4MDgxIn0.gdeVqDfPOUKHR4sm_Ws9vsuk3Uf0ymd5oi7sjZeTs9eQrzmSdLZgXecFMF_-M1tdWoTiNfYT0a2RIs0C7HDONBeNOnWjNRBT10eJk8_ViyaA1AWgU21dnI8ctT0R9JA6RrFyI8xKCHSNYH654ZYA6RUk46Vo0oCA24zb6ZNBMEQM_WAbp59RVOTuv758gJ5uKLuvYIlG1IZX15t359BzxFouggVBl0126xUam2zmOee0uts02yCKefXJuUt_CttLzhajqOD9hYGAxqOgp1hxC-Vwqpa7XqTHb2Y7Tg9fvgv8-_nmRPVN2jukq9V1aQxzd10yXzdab-gGSR4Xf-CjVw
+
+{
+  "email": "user3@example.com"
+}
+### Test Gateway Notification Route through Nginx
+POST https://platform.amcloud.cm/notifications/send
+Content-Type: application/json
+Authorization: Bearer eyJraWQiOiJteS1rZXktaWQiLCJhbGciOiJSUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInNjb3BlcyI6WyJyZWFkIiwid3JpdGUiXSwic3ViIjoiYWRtaW4iLCJpYXQiOjE3NDkwMjc0NzIsImV4cCI6MTc0OTAzMTA3MiwiaXNzIjoiaHR0cDovL2lhbTo4MDgxIn0.gdeVqDfPOUKHR4sm_Ws9vsuk3Uf0ymd5oi7sjZeTs9eQrzmSdLZgXecFMF_-M1tdWoTiNfYT0a2RIs0C7HDONBeNOnWjNRBT10eJk8_ViyaA1AWgU21dnI8ctT0R9JA6RrFyI8xKCHSNYH654ZYA6RUk46Vo0oCA24zb6ZNBMEQM_WAbp59RVOTuv758gJ5uKLuvYIlG1IZX15t359BzxFouggVBl0126xUam2zmOee0uts02yCKefXJuUt_CttLzhajqOD9hYGAxqOgp1hxC-Vwqpa7XqTHb2Y7Tg9fvgv8-_nmRPVN2jukq9V1aQxzd10yXzdab-gGSR4Xf-CjVw
+
+{
+  "to": "andersonmetsanoum@gmail.com",
+  "subject": "Welcome",
+  "content": "Welcome to AMCLOUD platform!"
+}

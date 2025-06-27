@@ -25,7 +25,7 @@ services:
       - iam
 
   configserver:
-    image: ghcr.io/projects-in3-uds/configserver:1.0.1
+    image: ghcr.io/project-in3-uds/configserver:1.0.1
     container_name: configserver
     volumes:
       - ./env/.env.config-server:/app/.env:ro
@@ -82,7 +82,7 @@ services:
       start_period: 60s
 
   iam:
-    image: ghcr.io/projects-in3-uds/iam:1.0.1
+    image: ghcr.io/project-in3-uds/iam:1.0.1
     container_name: iam
     volumes:
       - ./env/.env.iam:/app/.env:ro
@@ -104,7 +104,7 @@ services:
       start_period: 90s
 
   reservation:
-    image: ghcr.io/projects-in3-uds/reservation:1.0.1
+    image: ghcr.io/project-in3-uds/reservation:1.0.1
     container_name: reservation
     volumes:
       - ./env/.env.reservation:/app/.env:ro
@@ -128,7 +128,7 @@ services:
       start_period: 120s
 
   billing:
-    image: ghcr.io/projects-in3-uds/billing:1.0.1
+    image: ghcr.io/project-in3-uds/billing:1.0.1
     container_name: billing
     volumes:
       - ./env/.env.billing:/app/.env:ro
@@ -152,7 +152,7 @@ services:
       start_period: 120s
 
   notification:
-    image: ghcr.io/projects-in3-uds/notification:1.0.1
+    image: ghcr.io/project-in3-uds/notification:1.0.1
     container_name: notification
     volumes:
       - ./env/.env.notification:/app/.env:ro
@@ -174,7 +174,7 @@ services:
       start_period: 120s
 
   invitation:
-    image: ghcr.io/projects-in3-uds/invitation:1.0.1
+    image: ghcr.io/project-in3-uds/invitation:1.0.1
     container_name: invitation
     volumes:
       - ./env/.env.invitation:/app/.env:ro
@@ -199,6 +199,3 @@ services:
 
 volumes:
   postgres-data:
-
-
-
