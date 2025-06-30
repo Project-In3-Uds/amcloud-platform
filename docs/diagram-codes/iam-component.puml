@@ -1,0 +1,57 @@
+@startuml
+left to right direction
+title IAM Microservice Component Diagram
+
+' Style des composants
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  FontColor #0D47A1
+  RoundCorner 10
+}
+
+' Style des bases de données
+skinparam database {
+  BackgroundColor #FFEBEE
+  BorderColor #F44336
+  FontColor #B71C1C
+  RoundCorner 10
+}
+
+' Style des flèches pour les rendre plus droites
+skinparam arrow {
+  Color #7B1FA2
+  Thickness 2
+}
+
+' Définition des composants externes (pour le contexte)
+component "API Gateway" as gateway
+component "Config Server" as configServer
+
+' Définition des composants principaux du service IAM
+component "Authentication Controller" as authController
+component "Authorization Controller" as authzController
+component "User Service" as userService
+component "Role Service" as roleService
+component "JWT Utility" as jwtUtility
+
+' Base de données associée
+database "IAM Database" as iamdb
+
+' Organisation spatiale (pour éviter les croisements)
+gateway -down-> authController : User Login/Auth Requests
+gateway -down-> authzController : JWT Validation/AuthZ Requests
+
+configServer -down-> userService : Provides Configuration at Startup
+configServer -down-> roleService : Provides Configuration at Startup
+
+authController -right-> userService : Handles Login
+authController -down-> jwtUtility : Generates JWT
+
+authzController -right-> jwtUtility : Validates JWT
+authzController -down-> roleService : Checks Permissions
+
+userService -down-> iamdb : CRUD Operations (User Data)
+roleService -down-> iamdb : CRUD Operations (Role Data)
+
+@enduml

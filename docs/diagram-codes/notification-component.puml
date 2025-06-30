@@ -1,0 +1,50 @@
+@startuml
+title Notification Microservice Component Diagram
+
+' Style des composants
+skinparam component {
+BackgroundColor #E3F2FD
+BorderColor #90CAF9
+FontColor #0D47A1
+RoundCorner 10
+}
+
+' Style des bases de données (inclu même si pas utilisée pour consistance de skinparam)
+skinparam database {
+BackgroundColor #FFEBEE
+BorderColor #F44336
+FontColor #B71C1C
+RoundCorner 10
+}
+
+' Style des flèches pour les rendre plus droites
+skinparam arrow {
+linetype ortho
+}
+
+' Définition des composants externes (pour le contexte)
+component "API Gateway" as gateway
+component "Config Server" as configServer
+
+' Définition des composants principaux du service Notification
+component "Notification Controller" as notificationController
+component "Notification Service" as notificationService
+component "Email Utility" as emailUtility
+component "SMS Utility" as smsUtility
+
+' Relations avec les composants externes
+gateway --> notificationController : Routes API Requests
+configServer --> notificationService : Provides Configuration at Startup
+
+' Relations entre les composants internes
+notificationController --> notificationService : Handles API Requests
+notificationService --> emailUtility : Sends Emails
+notificationService --> smsUtility : Sends SMS
+
+' Note pour l'absence de base de données
+note right of notificationService
+No database
+for this service.
+end note
+
+@enduml

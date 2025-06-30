@@ -1,0 +1,46 @@
+@startuml
+title Billing Microservice Component Diagram
+
+' Style des composants
+skinparam component {
+BackgroundColor #E3F2FD
+BorderColor #90CAF9
+FontColor #0D47A1
+RoundCorner 10
+}
+
+' Style des bases de données
+skinparam database {
+BackgroundColor #FFEBEE
+BorderColor #F44336
+FontColor #B71C1C
+RoundCorner 10
+}
+
+' Style des flèches pour les rendre plus droites
+skinparam arrow {
+linetype ortho
+}
+
+' Définition des composants externes (pour le contexte)
+component "API Gateway" as gateway
+component "Config Server" as configServer
+
+' Définition des composants principaux du service Billing
+component "Billing Controller" as billingController
+component "Billing Service" as billingService
+component "Payment Gateway Client" as paymentGatewayClient
+
+' Base de données associée
+database "Billing Database" as billingdb
+
+' Relations avec les composants externes
+gateway --> billingController : Routes API Requests
+configServer --> billingService : Provides Configuration at Startup
+
+' Relations entre les composants internes
+billingController --> billingService : Handles API Requests
+billingService --> billingdb : CRUD Operations
+billingService --> paymentGatewayClient : Processes Payments
+
+@enduml

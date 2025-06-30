@@ -1,0 +1,86 @@
+@startuml
+left to right direction
+title Microservices Dataflow Diagram
+
+skinparam rectangle {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  FontColor #0D47A1
+  RoundCorner 10
+}
+
+skinparam database {
+  BackgroundColor #FFEBEE
+  BorderColor #F44336
+  FontColor #B71C1C
+  RoundCorner 10
+}
+
+skinparam arrow {
+  Color #7B1FA2
+  Thickness 2
+  linetype ortho
+}
+
+actor User as user
+
+' Entrée
+rectangle "API Gateway" as gateway
+
+' Orchestration/config
+rectangle "Config Server" as configserver
+
+' Services métiers (alignés verticalement)
+rectangle "IAM Service" as iam
+rectangle "Reservation Service" as reservation
+rectangle "Invitation Service" as invitation
+rectangle "Notification Service" as notification
+rectangle "Billing Service" as billing
+
+' Bases de données & externes
+database "IAM DB" as iamdb
+database "Reservation DB" as reservationdb
+database "Invitation DB" as invitationdb
+database "Billing DB" as billingdb
+
+rectangle "Gmail (SMTP)" as emailProvider
+rectangle "SMS Provider" as smsProvider
+rectangle "Payment Gateway" as paymentGateway
+rectangle "Git Repository" as gitRepo
+
+' --- Flux principal simplifié ---
+user --> gateway : API Requests
+
+gateway --> iam : Auth
+gateway --> reservation : Reservation
+gateway --> invitation : Invitation
+gateway --> notification : Notification
+gateway --> billing : Billing
+
+iam --> gateway : JWT/Auth Result
+
+' --- Config Server fournit la config à chaque microservice ---
+configserver --> gitRepo : Pulls Config
+configserver --> iam : Config
+configserver --> reservation : Config
+configserver --> invitation : Config
+configserver --> notification : Config
+configserver --> billing : Config
+
+' --- Métiers et persistance ---
+iam --> iamdb : CRUD
+reservation --> reservationdb : CRUD
+invitation --> invitationdb : CRUD
+billing --> billingdb : CRUD
+
+' --- Notifications & Paiements ---
+reservation --> notification : Notify
+reservation --> billing : Paiement
+invitation --> notification : Notify
+
+notification --> emailProvider : Email
+notification --> smsProvider : SMS
+
+billing --> paymentGateway : Paiement
+
+@enduml
