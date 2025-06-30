@@ -1,0 +1,51 @@
+@startuml
+title Invitation Microservice Component Diagram
+
+' Style des composants
+skinparam component {
+BackgroundColor #E3F2FD
+BorderColor #90CAF9
+FontColor #0D47A1
+RoundCorner 10
+}
+
+' Style des bases de données
+skinparam database {
+BackgroundColor #FFEBEE
+BorderColor #F44336
+FontColor #B71C1C
+RoundCorner 10
+}
+
+' Style des flèches pour les rendre plus droites
+skinparam arrow {
+linetype ortho
+}
+
+' Définition des composants externes (pour le contexte)
+component "API Gateway" as gateway
+component "Config Server" as configServer
+
+' Définition des composants principaux du service Invitation
+component "Invitation Controller" as invitationController
+component "Invitation Service" as invitationService
+component "Notification Client" as notificationClient
+
+' Base de données associée
+database "Invitation Database" as invitationdb
+
+' Relations avec les composants externes
+gateway --> invitationController : Routes API Requests
+configServer --> invitationService : Provides Configuration at Startup
+
+' Relations entre les composants internes
+invitationController --> invitationService : Handles API Requests
+invitationService --> invitationdb : CRUD Operations
+invitationService --> notificationClient : Triggers Notification Sending
+
+note right of notificationClient
+e.g., REST Client to Notification Service
+or Kafka Producer
+end note
+
+@enduml
