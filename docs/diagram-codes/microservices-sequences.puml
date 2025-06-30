@@ -1,0 +1,110 @@
+@startuml
+title Scenario: Reservation Creation with Billing and Ticket Delivery
+
+' General configuration for better readability
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 20
+skinparam BoxPadding 10
+skinparam NoteBorderColor #cccccc
+skinparam NoteBackgroundColor #fdfdcb
+skinparam arrow {
+Color #7B1FA2
+Thickness 1.5
+linetype ortho
+}
+
+autonumber
+
+actor User as User
+participant "IAM Service" as IAM
+participant "API Gateway" as Gateway
+participant "Config Server" as ConfigServer
+participant "Reservation Service" as Reservation
+participant "Invitation Service" as Invitation
+participant "Notification Service" as Notification
+participant "Billing Service" as Billing
+database "IAM Database" as IAMDB
+database "Reservation Database" as ReservationDB
+database "Invitation Database" as InvitationDB
+database "Billing Database" as BillingDB
+participant "Gmail (SMTP)" as Gmail
+participant "Payment Gateway External" as PaymentGateway
+
+== Service Initialization (Configuration Retrieval at Startup) ==
+group Initialization
+ConfigServer -> IAM: Provides Configuration
+ConfigServer -> Gateway: Provides Configuration
+ConfigServer -> Reservation: Provides Configuration
+ConfigServer -> Invitation: Provides Configuration
+ConfigServer -> Notification: Provides Configuration
+ConfigServer -> Billing: Provides Configuration
+end
+
+== Step 1: User Authentication ==
+User -> IAM: POST /login (email/password)
+activate User
+activate IAM
+IAM --> User: Returns JWT + Refresh Token
+deactivate IAM
+deactivate User
+note right of User
+JWT for future requests
+end note
+
+== Step 2: Reservation Creation ==
+User -> Gateway: POST /reservations/create (with JWT)
+activate User
+activate Gateway
+Gateway -> Gateway: Validates JWT (signature, expiration, roles)
+note right of Gateway
+Validation with JWKS keys
+obtained from IAM
+end note
+
+alt Valid and Authorized JWT
+Gateway -> Reservation: Forward Request: Create Reservation
+activate Reservation
+Reservation -> ReservationDB: Save New Reservation
+activate ReservationDB
+ReservationDB --> Reservation: Save Confirmation
+deactivate ReservationDB
+
+== Step 3: Billing Trigger (by Reservation) ==
+Reservation -> Billing: Internal Call: Process Reservation Payment
+activate Billing
+Billing -> PaymentGateway: Process Payment Transaction
+activate PaymentGateway
+PaymentGateway --> Billing: Payment Confirmation
+deactivate PaymentGateway
+Billing -> BillingDB: Save Billing Details
+activate BillingDB
+BillingDB --> Billing: Save Confirmation
+deactivate BillingDB
+Billing --> Reservation: Payment Processing Confirmation
+deactivate Billing
+
+== Step 4: Ticket Delivery by Email ==
+Reservation -> Notification: Internal Call: Send Ticket by Email
+activate Notification
+Notification -> Gmail: Send Email with Downloadable Ticket
+activate Gmail
+Gmail --> Notification: Email Send Confirmation
+deactivate Gmail
+deactivate Notification
+note right of Notification
+Contains download link or attachment
+end note
+
+Reservation --> Gateway: Reservation Creation Confirmation
+deactivate Reservation
+Gateway --> User: Final API Response (Success)
+deactivate Gateway
+deactivate User
+
+else Invalid / Access Denied JWT
+Gateway --x User: 401 Unauthorized / 403 Forbidden
+deactivate Gateway
+deactivate User
+end
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+left to right direction
+title Config Server Microservice Component Diagram
+
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  FontColor #0D47A1
+  RoundCorner 10
+}
+
+skinparam arrow {
+  Color #7B1FA2
+  Thickness 2
+}
+
+' Composants externes
+component "Other Microservices" as otherMicroservices
+component "Git Repository" as gitRepo
+
+' Config Server principal (regroupé)
+component "Config Server" as configServer
+
+' Relations
+otherMicroservices --> configServer : Fetch configuration (HTTP)
+configServer --> gitRepo : Reads configuration files (Git)
+
+@enduml

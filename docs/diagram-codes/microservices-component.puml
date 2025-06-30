@@ -1,0 +1,113 @@
+@startuml
+title Microservices Component Diagram
+
+' Style des composants
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  FontColor #0D47A1
+  RoundCorner 10
+}
+
+' Style des bases de données
+skinparam database {
+  BackgroundColor #FFEBEE
+  BorderColor #F44336
+  FontColor #B71C1C
+  RoundCorner 10
+}
+
+' Style des flèches pour les rendre plus droites
+skinparam arrow {
+  linetype ortho
+}
+
+' Définition du Config Server (unique)
+component "Config Server" as configServer
+component "Git Repository" as gitRepo
+configServer --> gitRepo : Reads configuration files
+
+' IAM Microservice
+package "IAM Microservice" {
+  component "Authentication Controller" as authController
+  component "Authorization Controller" as authzController
+  component "User Service" as userService
+  component "Role Service" as roleService
+  component "JWT Utility" as jwtUtility
+  database "IAM Database" as iamdb
+
+  authController --> userService : Handles Login
+  authController --> jwtUtility : Generates JWT
+  authzController --> jwtUtility : Validates JWT
+  authzController --> roleService : Checks Permissions
+  userService --> iamdb : CRUD Operations (User Data)
+  roleService --> iamdb : CRUD Operations (Role Data)
+  configServer --> userService : Provides Configuration at Startup
+  configServer --> roleService : Provides Configuration at Startup
+}
+
+' Reservation Microservice
+package "Reservation Microservice" {
+  component "Reservation Controller" as reservationController
+  component "Reservation Service" as reservationService
+  component "Notification Client" as notificationClient
+  component "Billing Client" as billingClient
+  database "Reservation Database" as reservationdb
+
+  reservationController --> reservationService : Handles API Requests
+  reservationService --> reservationdb : CRUD Operations
+  reservationService --> notificationClient : Sends Notifications
+  reservationService --> billingClient : Handles Payments
+  configServer --> reservationService : Provides Configuration at Startup
+}
+
+' Notification Microservice
+package "Notification Microservice" {
+  component "Notification Controller" as notificationController
+  component "Notification Service" as notificationService
+  component "Email Utility" as emailUtility
+  component "SMS Utility" as smsUtility
+
+  notificationController --> notificationService : Handles API Requests
+  notificationService --> emailUtility : Sends Emails
+  notificationService --> smsUtility : Sends SMS
+  configServer --> notificationService : Provides Configuration at Startup
+
+  note right of notificationService
+  No database
+  for this service.
+  end note
+}
+
+' Invitation Microservice
+package "Invitation Microservice" {
+  component "Invitation Controller" as invitationController
+  component "Invitation Service" as invitationService
+  component "Notification Client" as notificationClient
+  database "Invitation Database" as invitationdb
+
+  invitationController --> invitationService : Handles API Requests
+  invitationService --> invitationdb : CRUD Operations
+  invitationService --> notificationClient : Triggers Notification Sending
+  configServer --> invitationService : Provides Configuration at Startup
+
+  note right of notificationClient
+  e.g., REST Client to Notification Service
+  or Kafka Producer
+  end note
+}
+
+' Billing Microservice
+package "Billing Microservice" {
+  component "Billing Controller" as billingController
+  component "Billing Service" as billingService
+  component "Payment Gateway Client" as paymentGatewayClient
+  database "Billing Database" as billingdb
+
+  billingController --> billingService : Handles API Requests
+  billingService --> billingdb : CRUD Operations
+  billingService --> paymentGatewayClient : Processes Payments
+  configServer --> billingService : Provides Configuration at Startup
+}
+
+@enduml

@@ -1,0 +1,93 @@
+@startuml
+left to right direction
+title Microservices Architecture Overview
+
+' Définition des couleurs personnalisées
+!define RECTANGLE_COLOR #E3F2FD
+!define DATABASE_COLOR #FFEBEE
+
+' Style des rectangles (services)
+skinparam rectangle {
+  BackgroundColor RECTANGLE_COLOR
+  BorderColor #90CAF9
+  FontColor #0D47A1
+  RoundCorner 10
+}
+
+' Style des bases de données
+skinparam database {
+  BackgroundColor DATABASE_COLOR
+  BorderColor #F44336
+  FontColor #B71C1C
+  RoundCorner 10
+}
+
+' Style des flèches
+skinparam arrow {
+  Color #7B1FA2
+  Thickness 2
+}
+
+' Style des acteurs
+skinparam actor {
+  FontColor #3F51B5
+  LineColor #3F51B5
+}
+
+' Définition de l'acteur externe
+actor User as user
+
+' Définition du gateway et des services principaux
+rectangle "API Gateway" as gateway
+
+' Bloc IAM/Config
+rectangle "IAM Service" as iam
+rectangle "Config Server" as configserver
+
+' Bloc microservices métiers
+package "Core Microservices" as core_services {
+  rectangle "Reservation Service" as reservation
+  rectangle "Invitation Service" as invitation
+  rectangle "Notification Service" as notification
+  rectangle "Billing Service" as billing
+}
+
+' Bases de données associées
+database "IAM Database" as iamdb
+database "Reservation Database" as reservationdb
+database "Invitation Database" as invitationdb
+database "Billing Database" as billingdb
+
+' ----------- Relations principales -----------
+
+user --> gateway : API Requests
+
+gateway --> iam : Authentication & Authorization
+gateway --> reservation : Manages Reservations
+gateway --> invitation : Manages Invitations
+gateway --> notification : Manages Notifications
+gateway --> billing : Manages Billing
+
+' ----------- Persistences -----------
+
+iam --> iamdb : User & Role Data
+reservation --> reservationdb : Reservation Data
+invitation --> invitationdb : Invitation Data
+billing --> billingdb : Billing Data
+
+' ----------- Note sur Notification -----------
+
+note right of notification
+No database
+for now
+end note
+
+' ----------- Config Server -> Services -----------
+
+configserver -down-> iam : Provides Configuration
+configserver -down-> reservation : Provides Configuration
+configserver -down-> invitation : Provides Configuration
+configserver -down-> notification : Provides Configuration
+configserver -down-> billing : Provides Configuration
+
+@enduml
